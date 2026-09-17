@@ -760,7 +760,9 @@ class GetDelegate extends RouterDelegate<RouteDecoder>
           _activePages.add(res);
           break;
         case PreventDuplicateHandlingMode.popUntilOriginalRoute:
-          while (_activePages.last == onStackPage) {
+          // Pop down to the original entry, not the entry itself (the
+          // condition was inverted).
+          while (_activePages.last != onStackPage) {
             _popWithResult();
           }
           break;
