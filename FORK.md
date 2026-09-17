@@ -19,8 +19,35 @@ the mutation it guards against. No reformatting, no renames, no new APIs.
 | `rx` | `assignAll` consumes a lazy iterable after clearing the list | SINT 1.6.2 |
 | errors | Raw `throw 'string'` replaced by `Exception` | Aniketkhote/getx, jonataslaw/getx#3462 |
 | navigation | `offAllNamed`/`offNamedUntil` never complete the futures of dropped pages | SINT 1.3.1 |
+| navigation | `Get.back()` pops the page under an open dialog or bottom sheet instead of the overlay | devs-flutter-plugin/getx 28cb1bba (PopupRoute branch only) |
+| `rx` | `RxList()`/`RxMap()`/`RxSet()` without argument throw on first mutation | devs-flutter-plugin/getx 28cb1bba, Aniketkhote/getxify b39db519, jonataslaw/getx#3411 |
+| i18n | A device locale change overrides the locale chosen by the app | rewritten from getxify b39db519, jonataslaw/getx#3357 |
+| navigation | `GetPage.copyWith` loses `restorationId` and `preventDuplicateHandlingMode` | linpengteng/getx a6df1ffd |
+| navigation | `popUntilOriginalRoute` pops nothing, or the original route itself | this fork |
+| `rx` | `bindStream` outside a build is never cancelled, even by `close()` | getxify aa6f5e16, 610f9455, jonataslaw/getx#3000 |
+| state | `GetBuilder(global: false)` never closes its controller | SleepySquash/getx 7b66f071, getxify, jonataslaw/getx#2123 |
+| state | `GetX(global: false)` never closes its controller | same |
+| workers | A disposed `debounce` worker still fires its pending callback | getxify f7104646 |
+| workers | A disposed `interval` worker still fires its pending callback | this fork |
 
 `git log master..rc-fixes` gives the mechanism of each fix.
+
+### Visible behaviour changes
+
+- `Get.back()` with a dialog or bottom sheet on top closes that overlay
+  (also on the root page, and also with `canPop: false`) and completes its
+  future with `result`. Open snackbars are still not closed by `Get.back()`.
+- Once the app sets a locale (`Get.updateLocale`, `GetMaterialApp(locale:)`
+  or `Get.locale = ...`), device locale changes are ignored. This includes
+  `GetMaterialApp(locale: Get.deviceLocale)`.
+- A `global: false` controller given to `GetBuilder`/`GetX` is closed when
+  the widget is disposed, unless `autoRemove: false`.
+
+### API additions required by a fix
+
+- `GetPage.copyWith(preventDuplicateHandlingMode:)`.
+- `GetRootState.localeSetExplicitly` (static; `GetRootState` is not
+  exported by `package:get/get.dart`).
 
 ## Not included
 
