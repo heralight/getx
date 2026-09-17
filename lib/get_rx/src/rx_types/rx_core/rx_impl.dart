@@ -134,6 +134,20 @@ mixin RxObjectMixin<T> on GetListenable<T> {
 
     final sub = stream.listen((va) => value = va);
     reportAdd(sub.cancel);
+    // reportAdd only records the subscription during an Obx/GetX build;
+    // keep it so close() cancels a binding made anywhere else (onInit).
+    _boundSubscriptions.add(sub);
+  }
+
+  final List<StreamSubscription<T>> _boundSubscriptions = [];
+
+  @override
+  void close() {
+    for (final sub in _boundSubscriptions) {
+      sub.cancel();
+    }
+    _boundSubscriptions.clear();
+    super.close();
   }
 }
 
