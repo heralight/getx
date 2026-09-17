@@ -238,7 +238,11 @@ Worker debounce<T>(
     onDone: onDone,
     cancelOnError: cancelOnError,
   );
-  return Worker(sub.cancel, '[debounce]');
+  // Also cancel the armed Debouncer, or the callback fires after dispose().
+  return Worker(() {
+    newDebouncer.cancel();
+    return sub.cancel();
+  }, '[debounce]');
 }
 
 class Worker {
