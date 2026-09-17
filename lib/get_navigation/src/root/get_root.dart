@@ -460,12 +460,27 @@ class GetRootState extends State<GetRoot> with WidgetsBindingObserver {
     }
   }
 
+  /// Set by `Get.updateLocale`: the application chose its locale, so device
+  /// locale changes no longer replace it. Static, like `Get.locale`, because
+  /// `Get.updateLocale` may run before the root is mounted.
+  static bool localeSetExplicitly = false;
+
+  /// The locale last adopted from the device by [didChangeLocales].
+  Locale? _adoptedDeviceLocale;
+
   @override
   void didChangeLocales(List<Locale>? locales) {
     Get.asap(() {
       final locale = Get.deviceLocale;
-      if (locale != null) {
-        Get.updateLocale(locale);
+      // Follow the device only when the app never chose a locale itself
+      // (GetMaterialApp(locale:), Get.updateLocale, or a direct Get.locale
+      // assignment). Rewritten from getxify b39db519 (jonataslaw/getx#3357).
+      final followsDevice = !localeSetExplicitly &&
+          (Get.locale == null || Get.locale == _adoptedDeviceLocale);
+      if (locale != null && followsDevice) {
+        _adoptedDeviceLocale = locale;
+        Get.locale = locale;
+        Get.forceAppUpdate();
       }
     });
   }
