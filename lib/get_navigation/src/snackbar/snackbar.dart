@@ -440,7 +440,10 @@ You need to either use message[String], or messageText[Widget] or define a userI
         border: widget.borderColor != null
             ? Border.all(
                 color: widget.borderColor!,
-                width: widget.borderWidth!,
+                // `Get.snackbar` declares `double? borderWidth` and forwards
+                // it verbatim, so an explicit null overrides the constructor
+                // default of 1.0. Falling back here covers every entry point.
+                width: widget.borderWidth ?? 1.0,
               )
             : null,
       ),
@@ -475,7 +478,10 @@ You need to either use message[String], or messageText[Widget] or define a userI
         boxShadow: widget.boxShadows,
         borderRadius: BorderRadius.circular(widget.borderRadius),
         border: widget.borderColor != null
-            ? Border.all(color: widget.borderColor!, width: widget.borderWidth!)
+            ? Border.all(
+                color: widget.borderColor!,
+                width: widget.borderWidth ?? 1.0,
+              )
             : null,
       ),
       child: Column(
