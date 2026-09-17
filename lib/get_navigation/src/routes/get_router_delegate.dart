@@ -775,6 +775,18 @@ class GetDelegate extends RouterDelegate<RouteDecoder>
       notifyListeners();
     }
 
+    // doNothing and popUntilOriginalRoute push nothing: the fresh completer
+    // of [decoder] is not on the stack, no pop can complete it, and awaiting
+    // its future would hang forever. Complete with null, as when a
+    // middleware cancels the push.
+    if (onStackPage != null &&
+        (preventDuplicateHandlingMode ==
+                PreventDuplicateHandlingMode.doNothing ||
+            preventDuplicateHandlingMode ==
+                PreventDuplicateHandlingMode.popUntilOriginalRoute)) {
+      return null;
+    }
+
     return decoder.route?.completer?.future as Future<T?>?;
   }
 
