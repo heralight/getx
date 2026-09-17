@@ -65,7 +65,7 @@ class MiniStream<T> {
 
   void close() {
     if (_isClosed) {
-      throw 'You can not close a closed Stream';
+      throw Exception('You can not close a closed Stream');
     }
     listenable._notifyDone();
     listenable.clear();

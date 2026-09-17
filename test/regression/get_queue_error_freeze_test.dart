@@ -19,7 +19,7 @@ void main() {
           .timeout(const Duration(milliseconds: 300),
               onTimeout: () => 'QUEUE FROZEN');
       if (!done.isCompleted) done.complete(next);
-    }, (_, __) {});
+    }, (_, _) {});
     return done.future;
   }
 

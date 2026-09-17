@@ -360,7 +360,7 @@ class GetRootState extends State<GetRoot> with WidgetsBindingObserver {
 
   void onInit() {
     if (config.getPages == null && config.home == null) {
-      throw 'You need add pages or home';
+      throw Exception('You need add pages or home');
     }
 
     if (config.routerDelegate == null) {

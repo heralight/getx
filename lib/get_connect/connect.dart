@@ -376,7 +376,7 @@ class GetConnect extends GetConnectInterface {
 
   void _checkIfDisposed({bool isHttp = true}) {
     if (_isDisposed) {
-      throw 'Can not emit events to disposed clients';
+      throw Exception('Can not emit events to disposed clients');
     }
   }
 

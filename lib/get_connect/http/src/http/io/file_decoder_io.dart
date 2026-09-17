@@ -7,7 +7,7 @@ List<int> fileToBytes(dynamic data) {
     if (File(data).existsSync()) {
       return File(data).readAsBytesSync();
     } else {
-      throw 'File $data not exists';
+      throw Exception('File $data not exists');
     }
   } else if (data is List<int>) {
     return data;

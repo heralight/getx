@@ -281,9 +281,9 @@ extension Inst on GetInterface {
       final dep = _singl[key];
       if (dep == null) {
         if (tag == null) {
-          throw 'Class "$S" is not registered';
+          throw Exception('Class "$S" is not registered');
         } else {
-          throw 'Class "$S" with tag "$tag" is not registered';
+          throw Exception('Class "$S" with tag "$tag" is not registered');
         }
       }
 
@@ -294,7 +294,7 @@ extension Inst on GetInterface {
       return i ?? dep.getDependency() as S;
     } else {
       // ignore: lines_longer_than_80_chars
-      throw '"$S" not found. You need to call "Get.put($S())" or "Get.lazyPut(()=>$S())"';
+      throw Exception('"$S" not found. You need to call "Get.put($S())" or "Get.lazyPut(()=>$S())"');
     }
   }
 
