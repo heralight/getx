@@ -23,6 +23,7 @@ the mutation it guards against. No reformatting, no renames, no new APIs.
 | `rx` | `RxList()`/`RxMap()`/`RxSet()` without argument throw on first mutation | devs-flutter-plugin/getx 28cb1bba, Aniketkhote/getxify b39db519, jonataslaw/getx#3411 |
 | navigation | `GetPage.copyWith` loses `restorationId` and `preventDuplicateHandlingMode` | linpengteng/getx a6df1ffd |
 | navigation | `popUntilOriginalRoute` pops nothing, or the original route itself | this fork |
+| navigation | `toNamed` to a page already on the stack never completes with `doNothing` or `popUntilOriginalRoute` | this fork |
 | `rx` | `bindStream` outside a build is never cancelled, even by `close()` | getxify aa6f5e16, 610f9455, jonataslaw/getx#3000 |
 | state | `GetBuilder(global: false)` never closes its controller | SleepySquash/getx 7b66f071, getxify, jonataslaw/getx#2123 |
 | state | `GetX(global: false)` never closes its controller | same |
@@ -36,6 +37,9 @@ the mutation it guards against. No reformatting, no renames, no new APIs.
 - `Get.back()` with a dialog or bottom sheet on top closes that overlay
   (also on the root page, and also with `canPop: false`) and completes its
   future with `result`. Open snackbars are still not closed by `Get.back()`.
+- `toNamed` to a page already on the stack with `doNothing` or
+  `popUntilOriginalRoute` completes at once with `null` instead of never
+  completing.
 - A `global: false` controller given to `GetBuilder`/`GetX` is closed when
   the widget is disposed, unless `autoRemove: false`.
 
