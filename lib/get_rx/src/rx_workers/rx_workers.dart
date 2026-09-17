@@ -184,19 +184,25 @@ Worker interval<T>(
   bool? cancelOnError,
 }) {
   var debounceActive = false;
+  var disposed = false;
   StreamSubscription sub = listener.listen(
     (event) async {
       if (debounceActive || !_conditional(condition)) return;
       debounceActive = true;
       await Future.delayed(time);
       debounceActive = false;
+      // The wait outlives the subscription: do not call back once disposed.
+      if (disposed) return;
       callback(event);
     },
     onError: onError,
     onDone: onDone,
     cancelOnError: cancelOnError,
   );
-  return Worker(sub.cancel, '[interval]');
+  return Worker(() {
+    disposed = true;
+    return sub.cancel();
+  }, '[interval]');
 }
 
 /// [debounce] is similar to [interval], but sends the last value.
