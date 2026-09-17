@@ -536,6 +536,16 @@ class BindElement<T> extends InheritedElement {
       }
     }
 
+    // A local (global: false) controller is owned by this element and never
+    // reached by Get.delete: close the one this element started.
+    final localController = _controller;
+    if (!widget.global &&
+        widget.autoRemove &&
+        _wasStarted &&
+        localController is GetLifeCycleMixin) {
+      localController.onDelete();
+    }
+
     for (final disposer in disposers) {
       disposer();
     }
