@@ -110,6 +110,12 @@ class GetXState<T extends GetLifeCycleMixin> extends State<GetX<T>> {
       }
     }
 
+    // A local (global: false) controller was started in initState and is
+    // never reached by Get.delete: close it here.
+    if (!widget.global && widget.autoRemove) {
+      controller?.onDelete();
+    }
+
     for (final disposer in disposers) {
       disposer();
     }
