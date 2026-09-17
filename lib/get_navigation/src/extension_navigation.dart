@@ -1160,8 +1160,6 @@ extension GetNavigationExt on GetInterface {
 
   Future<void> updateLocale(Locale l) async {
     Get.locale = l;
-    // An explicit choice: device locale changes must not replace it.
-    GetRootState.localeSetExplicitly = true;
     await forceAppUpdate();
   }
 

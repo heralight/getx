@@ -21,7 +21,6 @@ the mutation it guards against. No reformatting, no renames, no new APIs.
 | navigation | `offAllNamed`/`offNamedUntil` never complete the futures of dropped pages | SINT 1.3.1 |
 | navigation | `Get.back()` pops the page under an open dialog or bottom sheet instead of the overlay | devs-flutter-plugin/getx 28cb1bba (PopupRoute branch only) |
 | `rx` | `RxList()`/`RxMap()`/`RxSet()` without argument throw on first mutation | devs-flutter-plugin/getx 28cb1bba, Aniketkhote/getxify b39db519, jonataslaw/getx#3411 |
-| i18n | A device locale change overrides the locale chosen by the app | rewritten from getxify b39db519, jonataslaw/getx#3357 |
 | navigation | `GetPage.copyWith` loses `restorationId` and `preventDuplicateHandlingMode` | linpengteng/getx a6df1ffd |
 | navigation | `popUntilOriginalRoute` pops nothing, or the original route itself | this fork |
 | `rx` | `bindStream` outside a build is never cancelled, even by `close()` | getxify aa6f5e16, 610f9455, jonataslaw/getx#3000 |
@@ -37,17 +36,12 @@ the mutation it guards against. No reformatting, no renames, no new APIs.
 - `Get.back()` with a dialog or bottom sheet on top closes that overlay
   (also on the root page, and also with `canPop: false`) and completes its
   future with `result`. Open snackbars are still not closed by `Get.back()`.
-- Once the app sets a locale (`Get.updateLocale`, `GetMaterialApp(locale:)`
-  or `Get.locale = ...`), device locale changes are ignored. This includes
-  `GetMaterialApp(locale: Get.deviceLocale)`.
 - A `global: false` controller given to `GetBuilder`/`GetX` is closed when
   the widget is disposed, unless `autoRemove: false`.
 
 ### API additions required by a fix
 
 - `GetPage.copyWith(preventDuplicateHandlingMode:)`.
-- `GetRootState.localeSetExplicitly` (static; `GetRootState` is not
-  exported by `package:get/get.dart`).
 
 ## Not included
 
@@ -65,6 +59,14 @@ the mutation it guards against. No reformatting, no renames, no new APIs.
   already use `MediaQuery.sizeOf`.
 - **jonataslaw/getx#3463** (`GetBuilder.controllerBuilder`): a new API.
 - **jonataslaw/getx#3472** (Flutter `material_ui`/`cupertino_ui`): see below.
+- **Device locale change overriding the app's locale** (getxify b39db519,
+  jonataslaw/getx#3357). A version was applied then reverted: telling an
+  explicit choice apart from a locale passed to `GetMaterialApp(locale:)`
+  is not reliable, and it stopped applications that drive the locale
+  through that parameter (e.g. from a translation package following the
+  device) from following device changes. A correct fix also needs
+  `GetRoot` to apply a changed `locale:` after mount, which it currently
+  ignores.
 
 ### About `material_ui` (#3472)
 
