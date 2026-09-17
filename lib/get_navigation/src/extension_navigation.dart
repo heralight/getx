@@ -822,6 +822,21 @@ extension GetNavigationExt on GetInterface {
       var count = 0;
       return searchDelegate(id).backUntil((route) => count++ == times);
     } else {
+      // Dialogs and bottom sheets are pageless PopupRoutes above the current
+      // GetPage: close the one on top instead of popping the page under it.
+      // Adapted from devs-flutter-plugin/getx 28cb1bba (PopupRoute branch
+      // only; open snackbars are not closed here).
+      final nav = searchDelegate(id).navigatorKey.currentState;
+      if (nav != null) {
+        Route<dynamic>? top;
+        nav.popUntil((route) {
+          top = route;
+          return true;
+        });
+        if (top is PopupRoute) {
+          return nav.pop<T>(result);
+        }
+      }
       if (canPop) {
         if (searchDelegate(id).canBack == true) {
           return searchDelegate(id).back<T>(result);
