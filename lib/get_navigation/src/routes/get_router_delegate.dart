@@ -733,6 +733,20 @@ class GetDelegate extends RouterDelegate<RouteDecoder>
     return decoder;
   }
 
+  /// Completes the route completer of [dropped] with `null` before it leaves
+  /// the stack, as [_unsafeHistoryRemoveAt] and [_popWithResult] already do
+  /// for the pages they remove. Without it, an awaited `toNamed` whose page
+  /// is replaced by a duplicate push would hang forever.
+  ///
+  /// [pushed] is the decoder whose completer `_push` hands back to its
+  /// caller: never complete that one here, it belongs to the new entry.
+  void _completePendingRoute(RouteDecoder dropped, RouteDecoder pushed) {
+    final completer = dropped.route?.completer;
+    if (completer == null || completer.isCompleted) return;
+    if (identical(completer, pushed.route?.completer)) return;
+    completer.complete(null);
+  }
+
   Future<T?> _push<T>(RouteDecoder decoder, {bool rebuildStack = true}) async {
     var res = await runMiddleware(decoder);
     if (res == null) return null;
@@ -756,6 +770,7 @@ class GetDelegate extends RouterDelegate<RouteDecoder>
         case PreventDuplicateHandlingMode.doNothing:
           break;
         case PreventDuplicateHandlingMode.reorderRoutes:
+          _completePendingRoute(onStackPage, decoder);
           _activePages.remove(onStackPage);
           _activePages.add(res);
           break;
@@ -767,6 +782,7 @@ class GetDelegate extends RouterDelegate<RouteDecoder>
           }
           break;
         case PreventDuplicateHandlingMode.recreate:
+          _completePendingRoute(onStackPage, decoder);
           _activePages.remove(onStackPage);
           _activePages.add(res);
       }

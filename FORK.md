@@ -24,6 +24,7 @@ the mutation it guards against. No reformatting, no renames, no new APIs.
 | navigation | `GetPage.copyWith` loses `restorationId` and `preventDuplicateHandlingMode` | linpengteng/getx a6df1ffd |
 | navigation | `popUntilOriginalRoute` pops nothing, or the original route itself | this fork |
 | navigation | `toNamed` to a page already on the stack never completes with `doNothing` or `popUntilOriginalRoute` | this fork |
+| navigation | `toNamed` to a page already on the stack drops the stacked entry without completing it, with `reorderRoutes` or `recreate` | this fork |
 | `rx` | `bindStream` outside a build is never cancelled, even by `close()` | getxify aa6f5e16, 610f9455, jonataslaw/getx#3000 |
 | state | `GetBuilder(global: false)` never closes its controller | SleepySquash/getx 7b66f071, getxify, jonataslaw/getx#2123 |
 | state | `GetX(global: false)` never closes its controller | same |
@@ -40,6 +41,10 @@ the mutation it guards against. No reformatting, no renames, no new APIs.
 - `toNamed` to a page already on the stack with `doNothing` or
   `popUntilOriginalRoute` completes at once with `null` instead of never
   completing.
+- `toNamed` to a page already on the stack with `reorderRoutes` or
+  `recreate` completes the *earlier* call's future with `null` when its
+  entry is replaced, instead of leaving it pending forever. The new call's
+  future still resolves on the next pop, with its result.
 - A `global: false` controller given to `GetBuilder`/`GetX` is closed when
   the widget is disposed, unless `autoRemove: false`.
 
