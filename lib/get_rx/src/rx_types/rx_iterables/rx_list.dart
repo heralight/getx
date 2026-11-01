@@ -168,7 +168,10 @@ extension ListExtension<E> on List<E> {
     add(item);
   }
 
-  /// Replaces all existing items of this list with [items]
+  /// Replaces all existing items of this list with a snapshot of [items].
+  ///
+  /// The source may be this list, its backing list, or a view of either.
+  /// If reading the source throws, the existing contents are left untouched.
   void assignAll(Iterable<E> items) {
     // Materialise the source BEFORE clearing. [items] is very often lazy --
     // `list.map(...)`, `list.where(...)` -- and two things go wrong if it is
@@ -183,7 +186,9 @@ extension ListExtension<E> on List<E> {
     //
     // Snapshotting first makes the operation atomic from the caller's point
     // of view: it either replaces the contents or leaves them untouched.
-    final source = items is List<E> ? items : List<E>.of(items);
+    // Even a List can alias this list or its backing storage, and custom
+    // List implementations can throw while being read. Always snapshot it.
+    final source = List<E>.of(items);
     if (this is RxList) {
       (this as RxList).value.clear();
     }

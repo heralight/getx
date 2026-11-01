@@ -901,6 +901,11 @@ print('json: ${jsonEncode(abc)}, type: ${abc.runtimeType}');
 abc.add(12); // pushes 12 to the list, and UPDATES the stream.
 abc[3]; // like Lists, reads the index 3.
 
+// assignAll snapshots its source before replacing the contents, including
+// when the source is this RxList, its backing list, or a list view.
+abc.assignAll(abc.where((value) => value.isEven));
+abc.assignAll(abc.value); // preserves the current contents.
+
 
 // equality works with the Rx and the value, but hashCode is always taken from the value
 final number = 12.obs;
